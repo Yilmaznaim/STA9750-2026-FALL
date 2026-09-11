@@ -1,16 +1,18 @@
 ---
 title: "NAIM YILMAZ"
 ---
+[Connect on LinkedIn](https://linkedin.com/in/naim-yilmaz){.btn .btn-primary target="_blank"}
+[Email Me](mailto:naimyilmaz11211@gmail.com){.btn .btn-outline-secondary}
+
+![](NAIMPIC.jpg){width=40% .rounded-circle fig-align="center"} 
 
 ## About Me
-![](NAIMPIC.jpg){width=20% .rounded-circle fig-align="center"} 
-
-
 Hello and welcome to my page. I'm Naim. I come from a background in finance and business, and I'm currently pursuing my Master's in AI and Business Analytics at Baruch College. Along the way, I've become really interested in how data and technology can help businesses make better decisions.
 
 This is a place where I will share my projects, experiences, and what I'm learning as I continue building my skills in finance, analytics, and technology.
 
-[Connect on LinkedIn](https://linkedin.com/in/naim-yilmaz){.btn .btn-primary target="_blank"}
-[Email Me](mailto:naimyilmaz11211@gmail.com){.btn .btn-outline-secondary}
 
-
+```
+{r}
+print(hello world)
+```
