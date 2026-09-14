@@ -3,7 +3,7 @@ title: "NAIM YILMAZ"
 ---
 [LinkedIn](https://linkedin.com/in/naim-yilmaz){.btn .btn-info target="_blank"}
 [Email](mailto:naimyilmaz11211@gmail.com){.btn .btn-outline-secondary}
-[Resume](Naim_Yilmaz_Resume.pdf){.btn .btn-success download="Naim_Yilmaz_Resume.pdf"}
+
 
 
 ![](NAIMPIC.jpg){width=38% .rounded-circle fig-align="center"} 
