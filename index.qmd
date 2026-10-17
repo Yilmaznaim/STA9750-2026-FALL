@@ -1,14 +1,14 @@
 ---
 title: "NAIM YILMAZ"
+format: "pdf"
 ---
-[LinkedIn](https://linkedin.com/in/naim-yilmaz){.btn .btn-info target="_blank"}
-[Email](mailto:naimyilmaz11211@gmail.com){.btn .btn-outline-secondary}
 
+[LinkedIn](https://linkedin.com/in/naim-yilmaz){.btn .btn-info target="_blank"} [Email](mailto:naimyilmaz11211@gmail.com){.btn .btn-outline-secondary}
 
-
-![](NAIMPIC.jpg){width=38% .rounded-circle fig-align="center"} 
+![](NAIMPIC.jpg){.rounded-circle width="38%" fig-align="center"}
 
 ## *About Me*
+
 Hello and welcome to my page. I'm Naim Yilmaz. I come from a background in finance and business, and I'm currently pursuing my Master's in AI and Business Analytics at Baruch College. Along the way, I've become really interested in how data and technology can help businesses make better decisions.
 
 ## *Education*
@@ -34,30 +34,25 @@ leaflet(width = "700px", height = "200px") |>
             "I am a Master's student at <b>Baruch College</b>!")
 ```
 
-**Baruch College/CUNY, Zicklin School of Business**             ,NY
- Master of Science,  AI and Business Analytics
+**Baruch College/CUNY, Zicklin School of Business** ,NY Master of Science, AI and Business Analytics
 
-**Baruch College/CUNY, Zicklin School of Business**   ,NY
- Bacheolar of Business Administration, Finance        
+**Baruch College/CUNY, Zicklin School of Business** ,NY Bacheolar of Business Administration, Finance
 
 ## *Work Experience*
 
-I've built my career at the intersection of finance, operations, and entrepreneurship. I got my start managing over $200K a month in revenue at Ayza Wine & Chocolate Bar, learning firsthand what it takes to keep a business running smoothly under pressure. From there, I moved into consulting as a Financial Analyst at Strategy Room Consulting, where I built financial models and market assessments that helped clients make smarter, faster decisions. But the experience that shaped me most was co-founding Lion's Milk Café taking it from a $200K business to a $350K valuation before a successful exit. Looking ahead, I'm eager to keep growing in the business analytics and finance field, combining the practical, real world decision making I've built over the years with the data and AI skills I'm developing now. 
+I've built my career at the intersection of finance, operations, and entrepreneurship. I got my start managing over \$200K a month in revenue at Ayza Wine & Chocolate Bar, learning firsthand what it takes to keep a business running smoothly under pressure. From there, I moved into consulting as a Financial Analyst at Strategy Room Consulting, where I built financial models and market assessments that helped clients make smarter, faster decisions. But the experience that shaped me most was co-founding Lion's Milk Café taking it from a \$200K business to a \$350K valuation before a successful exit. Looking ahead, I'm eager to keep growing in the business analytics and finance field, combining the practical, real world decision making I've built over the years with the data and AI skills I'm developing now.
 
 ## *LANGUAGE AND TECHNICAL SKILLS*
 
-**Computer:** Proficient in Microsoft Office Suite (Excel, Word, PowerPoint), Stata, Python, SQL 
+**Computer:** Proficient in Microsoft Office Suite (Excel, Word, PowerPoint), Stata, Python, SQL
 
-**Languages:** Native in Turkish, Fluent in English, Basic French and Spanish 
+**Languages:** Native in Turkish, Fluent in English, Basic French and Spanish
 
-**Certifications:**  Bloomberg Market Concepts, October 2024, Programming For Everybody (Python), University of 
-Michigan, April 30 2024, Deloitte – Data Analytics Job Simulation, October 2025
-
+**Certifications:** Bloomberg Market Concepts, October 2024, Programming For Everybody (Python), University of Michigan, April 30 2024, Deloitte – Data Analytics Job Simulation, October 2025
 
 ## Rent Problem In NY! (Final Project Idea)
 
 *Rent is one of our biggest everyday concerns, and in New York, prices have been climbing steadily since 2020 often feeling like they're hitting the ceiling. What's striking is that even with rents this high, popular neighborhoods like Williamsburg, Greenpoint, and the West Village still have very few vacant apartments. That combination of high prices and extremely low vacancy makes this an especially compelling topic for our project: it's a real world case study in how supply and demand actually plays out in the housing market. If you are interested hit yes :) and please check below I've put medians of rent prices In NYC borough map*
-
 
 ```{=html}
 <div class="text-center mt-4">
@@ -110,11 +105,12 @@ leaflet(boroughs) |>
   )
 ```
 
-*Median asking rent by NYC borough (larger, darker circles = higher rent). Hover over a marker to see the exact figure.*
 
 ```{r}
 #| include: false
 1+1
 ```
---------------
+
+------------------------------------------------------------------------
+
 Last Updated: `r format(Sys.time(), "%A %m %d, %Y at %H:%M%p")`

@@ -23,3 +23,4 @@ data/**
 **/*bspf
 /.quarto/
 **/*.quarto_ipynb
+Rplot.png
