@@ -1,7 +1,384 @@
+---
+title: "Mini-Project #01"
+format:
+  html:
+    code-fold: false
+---
+# Part 1:*DATA*
+```{r}
+#| message: false
+#| warning: false
 
-  ---
-  title: "Mini-Project Placeholder"
-  ---
+
+load_netflix_data <- function(){
   
-  This is a placeholder for STA9750 Mini-Project 1. Check back soon for more!
+  library(tidyverse)
+  library(rvest)
+  library(readxl)
+  library(fs)
   
+  data_dir <- path("data", "mp01")
+    
+  if(!dir_exists(data_dir)){
+    dir_create(data_dir, showWarnings=FALSE, recurse=TRUE)
+  }
+  
+  NETFLIX_URLS <- list(
+    `2023H1` = "https://about.netflix.com/news/what-we-watched-a-netflix-engagement-report",
+    `2023H2` = "https://about.netflix.com/news/what-we-watched-the-second-half-of-2023",
+    `2024H1` = "https://about.netflix.com/news/what-we-watched-the-first-half-of-2024",
+    `2024H2` = "https://about.netflix.com/news/what-we-watched-the-second-half-of-2024",
+    `2025H1` = "https://about.netflix.com/news/what-we-watched-the-first-half-of-2025",
+    `2025H2` = "https://about.netflix.com/news/what-we-watched-the-second-half-of-2025",
+    `2026H1` = "https://about.netflix.com/news/what-we-watched-the-first-half-of-2026"
+  )
+  
+  download_if_needed <- function(url, local){
+    if(!file_exists(local)){
+      download.file(url, local, quiet = TRUE, mode = "wb")
+    }
+    
+    return(local)
+  }
+    
+  NETFLIX_URLS |> 
+    map(read_html) |> 
+    map(html_element, xpath = "//a[contains(@href, '.xlsx')]") |> 
+    map_chr(html_attr, "href") |> 
+    enframe("period", "url") |> 
+   mutate(path = path(data_dir, paste0(period, ".xlsx")), 
+          path = map2(url, path, download_if_needed), 
+          data = map(path, read_excel, skip=3, na="*"), 
+          data = map(data, \(x) x |> mutate(`Release Date` = as.Date(`Release Date`)))) |>
+    unnest(data) |> 
+    select(-url, -path) |> 
+    mutate(year=str_sub(period, 1, 4), 
+           half=str_sub(period, start=6), 
+           period_start = make_date(year, if_else(half==1, 1, 7), 1), 
+           period_end = make_date(year, if_else(half==1, 6, 12), if_else(half==1, 30, 31))) |> 
+    filter(!is.na(`Hours Viewed`)) |> 
+    mutate(live_event = !is.na(Runtime) & str_detect(Runtime, "\\d+:\\d+\\*"), 
+           clean_time = str_remove(Runtime, fixed("*")),
+           Runtime = 60 * hour(hm(clean_time)) + minute(hm(clean_time))) |>
+    select(-clean_time) |>
+    mutate(Runtime = coalesce(Runtime, mean(Runtime, na.rm=TRUE)), 
+           .by=Title, 
+           Title = stringi::stri_trans_general(Title, "Latin-ASCII"),
+           Title = str_remove(Title, " // .*"), 
+           Title = str_remove(Title, "[^[:ascii:]].*"), 
+           Title = str_trim(Title)) |>
+    filter_out(Title == "") |>
+    select(year, 
+           period, 
+           period_start, 
+           period_end, 
+           Title, 
+           -half, 
+           Runtime, 
+           Views, 
+           `Hours Viewed`, 
+           `Release Date`,
+           `Available Globally?`, 
+           live_event)
+}
+
+NETFLIX_DATA <- load_netflix_data()
+```
+
+# PART 2 And 3: *Data Cleaning and Preparation*
+
+```{r}
+NETFLIX_DATA <- NETFLIX_DATA |>
+  rename(
+    title              = Title,
+    runtime            = Runtime,
+    hours_viewed       = `Hours Viewed`,
+    views              = Views,
+    release_date       = `Release Date`,
+    available_globally = `Available Globally?`
+  ) |>
+  mutate(
+    year               = as.integer(year),
+    available_globally = available_globally == "Yes"
+  )
+
+glimpse(NETFLIX_DATA)
+
+library(skimr)
+
+skim(NETFLIX_DATA)
+```
+
+# Part 4: *Initial Observation*
+We have total of 61,892 rows and 11 columns, covering almost 7 years of data including 24,427 title.
+*Runtime(Mean)=467.35 minutes*
+*Views(Mean)=1375241.45 views*
+*Hours_viewed=8265858.27 hours viewed*
+However, the medians are much lower.According to that, we can say that data is right skewed.Therefore, some titles are watched only little while a few big hits are watched so much that they pull the average up.
+
+# *Part 5: Exploratory Questions*
+### Question 1: What date range is covered by this data set?
+```{r}
+date_range <- NETFLIX_DATA |>
+  summarize(
+    start = min(period_start),
+    end   = max(period_end)
+  )
+```
+The data set covers viewing from 2023-01-01 through 2026-06-30.
+
+### Question 2: How many different shows and movies are covered in this data set?
+
+```{r}
+n_titles <- NETFLIX_DATA |>
+  summarize(n = n_distinct(title)) |>
+  pull(n)
+```
+This data shows us there are 24,427 different productions.
+
+### Question 3: How many total hours have been spent watching shows from the Bridgerton universe?
+
+```{r}
+bridgerton_hours <- NETFLIX_DATA |>
+  filter(str_detect(title, "Bridgerton")) |>
+  summarize(total = sum(hours_viewed)) |>
+  pull(total)
+```
+The total hours for Bridgerton= 4862800000
+
+### Question 4: How many total hours have been spent watching the five seasons of Stranger Things?
+
+```{r}
+stranger_things_hours <- NETFLIX_DATA |>
+  filter(str_detect(title, "Stranger Things")) |>
+  filter_out(str_detect(title, "Beyond")) |>
+  filter_out(str_detect(title, "Tales from")) |>
+  filter_out(str_detect(title, "Fireplace")) |>
+  summarize(total = sum(hours_viewed)) |>
+  pull(total)
+```
+The total hours viewed for Stranger Things= 5588900000
+
+### Question 5: What percentage of total watch time was spent on the Top 10 titles of 2026H1?
+
+```{r}
+h1_2026 <- NETFLIX_DATA |>
+  filter(period == "2026H1")
+
+total_hours <- sum(h1_2026$hours_viewed)
+
+top10_hours <- h1_2026 |>
+  slice_max(hours_viewed, n = 10, with_ties = FALSE) |>
+  summarize(total = sum(hours_viewed)) |>
+  pull(total)
+
+top10_pct <- 100 * top10_hours / total_hours
+```
+The top 10 titles were responsible for  6.70 percent of 2026H1 total viewed.
+
+### Question 6: What fraction of Netflix’s catalog is globally available? 
+
+```{r}
+global_availability <- NETFLIX_DATA |>
+  filter(!is.na(available_globally)) |>
+  summarize(global = any(available_globally), .by = title) |>
+  summarize(title_fraction = mean(global))
+
+hours_availability <- NETFLIX_DATA |>
+  filter(!is.na(available_globally)) |>
+  summarize(
+    hours_fraction = sum(hours_viewed[available_globally]) / sum(hours_viewed)
+  )
+
+title_pct <- round(100 * global_availability$title_fraction, 1)
+hours_pct <- round(100 * hours_availability$hours_fraction, 1)
+```
+Almost 35.1% of Netflix's portfolio is globally available by title. However, when it is weighted by by hours viewed, globally available titles for about 51.9% of total viewing hours.
+
+# *Part 6: Exploratory Questions-Table Answers*
+
+### Question 1: What was the top title (by total hours viewed) in each period and what fraction of total viewership did it capture?
+
+```{r}
+library(gt)
+
+NETFLIX_DATA |>
+  mutate(period_total = sum(hours_viewed), .by = period) |>
+  slice_max(hours_viewed, n = 1, with_ties = FALSE, by = period) |>
+  mutate(share = hours_viewed / period_total) |>
+  arrange(period) |>
+  select(period, title, hours_viewed, share) |>
+  gt() |>
+  tab_header(title = "Top Netflix Titles by Reporting Period") |>
+  cols_label(
+    period       = "Reporting Period",
+    title        = "Top Title",
+    hours_viewed = "Hours Viewed",
+    share        = "Share of Total Viewership"
+  ) |>
+  fmt_number(columns = hours_viewed, decimals = 0) |>
+  fmt_percent(columns = share, decimals = 2) |>
+  cols_align(align = "left", columns = c(period, title)) |>
+  opt_row_striping()
+```
+
+### Question 2: How has Netflix’s catalog changed in size over the periods for which we have data?
+
+```{r}
+catalog_size <- NETFLIX_DATA |>
+  summarize(
+    n_titles      = n_distinct(title),
+    total_runtime = sum(runtime, na.rm = TRUE) / 60,
+    .by = c(period, period_start)
+  ) |>
+  arrange(period_start) |>
+  select(-period_start)
+
+catalog_size |>
+  gt() |>
+  tab_header(title = "Netflix Catalog Size by Reporting Period") |>
+  cols_label(
+    period        = "Reporting Period",
+    n_titles      = "Number of Titles",
+    total_runtime = "Total Runtime (Hours)"
+  ) |>
+  fmt_number(columns = c(n_titles, total_runtime), decimals = 0) |>
+  cols_align(align = "left", columns = period) |>
+  opt_row_striping()
+```
+
+### Question 3: Which titles have had the most consistently high viewership across all periods?
+
+```{r}
+staples <- NETFLIX_DATA |>
+  summarize(
+    n_periods    = n_distinct(period),
+    avg_hours    = mean(hours_viewed),
+    min_hours    = min(hours_viewed),
+    sd_hours     = sd(hours_viewed),
+    .by = title
+  ) |>
+  filter(n_periods == n_distinct(NETFLIX_DATA$period)) |>
+  mutate(cv = sd_hours / avg_hours) |>
+  filter(min_hours >= 5e6, cv <= 0.5) |>
+  arrange(desc(min_hours)) |>
+  slice_head(n = 10)
+
+staples |>
+  select(title, avg_hours, min_hours, cv) |>
+  gt() |>
+  tab_header(
+    title = "Netflix Staples: Consistently High Viewership",
+    subtitle = "Titles reported in all 7 periods"
+  ) |>
+  cols_label(
+    title     = "Title",
+    avg_hours = "Average Hours Viewed",
+    min_hours = "Minimum Hours Viewed",
+    cv        = "Variation (SD / Mean)"
+  ) |>
+  fmt_number(columns = c(avg_hours, min_hours), decimals = 0) |>
+  fmt_number(columns = cv, decimals = 2) |>
+  cols_align(align = "left", columns = title) |>
+  opt_row_striping()
+```
+### Question 4: Within each period, what fraction of time was spent on ‘shows’ vs movies?
+
+```{r}
+viewing_by_type <- NETFLIX_DATA |>
+  mutate(
+    content_type = case_when(
+      str_detect(title, "Season") | runtime > 240 ~ "Shows",
+      is.na(runtime) ~ "Unknown",
+      TRUE ~ "Movies"
+    )
+  ) |>
+  group_by(period, content_type) |>
+  summarize(total_hours = sum(hours_viewed), .groups = "drop") |>
+  group_by(period) |>
+  mutate(share = total_hours / sum(total_hours)) |>
+  ungroup()
+
+viewing_by_type |>
+  gt(groupname_col = "period") |>
+  tab_header(title = "Viewing Share: Shows vs Movies") |>
+  cols_label(
+    content_type = "Content Type",
+    total_hours  = "Hours Viewed",
+    share        = "Share of Total Viewing"
+  ) |>
+  fmt_number(columns = total_hours, decimals = 0) |>
+  fmt_percent(columns = share, decimals = 2) |>
+  opt_row_striping()
+
+share_of <- function(p, type) {
+  viewing_by_type |>
+    filter(period == p, content_type == type) |>
+    pull(share) |>
+    scales::percent(accuracy = 0.1)
+}
+```
+
+### Question 5: How does the performance of live events compare to pre-taped content? Does the average live event draw more viewership than an average piece of pre-taped content? How about a ‘top tier’ live event vs ‘top tier’ pre-taped content?
+
+```{r}
+#| message: false
+#| warning: false
+library(gt)
+
+live_compare <- NETFLIX_DATA |>
+  mutate(content = if_else(live_event, "Live event", "Pre-taped")) |>
+  summarize(
+    n_rows       = n(),
+    avg_hours    = mean(hours_viewed),
+    median_hours = median(hours_viewed),
+    p90_hours    = quantile(hours_viewed, 0.90),
+    max_hours    = max(hours_viewed),
+    .by = content
+  )
+
+live_compare |>
+  gt() |>
+  tab_header(
+    title = "Live Events vs. Pre-Taped Content",
+    subtitle = "Hours viewed per title per period"
+  ) |>
+  cols_label(
+    content      = "Content Type",
+    n_rows       = "Title-Period Entries",
+    avg_hours    = "Average Hours",
+    median_hours = "Median Hours",
+    p90_hours    = "Top 10% Cutoff (90th Pctl.)",
+    max_hours    = "Maximum Hours"
+  ) |>
+  fmt_number(columns = everything(), decimals = 0) |>
+  cols_align(align = "left", columns = content) |>
+  opt_row_striping()
+```
+
+## Part 7: Corporate Strategy Memo
+
+**To:** Netflix Leadership
+
+**From:** Naim Yilmaz
+
+**Subject:** Content Strategy for 2027 and Beyond
+
+---
+
+  According to the data, Netflix should pursue these future commitments for the coming years. First, prioritizing globally available series is very important for the future strategy. Next, protecting the hype for most watched titles while funding/producing stable shows would be a crucial move. Also, expanding live events selectively, rather than broadly is maintaining excitement and unique feeling for the viewers.
+
+  Globally available titles are only 35.1% however they account for 51.9% of all hours viewed. Netflix should create more shows that they take the control over and attract viewers to subscribe for the shows that are only on Netflix. This way dependency on other productions would be reduced. Therefore, investing on global titles will benefit future attractions and bring in more subscriber loyalty.
+
+  Moreover, maintaining the momentum of its most watched title and funding stable, long running shows are also benefiting Netflix strategy. For instance, Wednesday Season 2 reached 964.1 million hours in 2025H2. The highest number recorded for any title in the data shows that the top 10 titles of 2026H1 accounted for 6.70% of total viewing. Consistent shows maintain viewer interest between major releases. For instance, Breaking Bad Season 2 consistently had at least 78.5 million hours viewed across the seven periods. So, it would be wise to suggest that Netflix continue to invest in new seasons of established franchises and monitor each title's minimum viewership across different periods, rather than focusing on its peak viewership at launch, when making renewal decisions.
+
+  Netflix also organizes live events only rarely, yet the median live event still drew 1.7 million hours, close to the 1.8 million for pretaped titles. This could be a valuable asset for Netflix if managed well. However, live events have a lower ceiling: the biggest live event reached 235.7 million hours, compared with 964.1 million for the biggest pre-taped title. For that reason, Netflix should be selective and focus on high profile, unique events. With live entertainment, viewers want to share in the hype and popularity within the community.
+
+  In conclusion, Netflix's future strategy should rest on prioritizing globally available series, which represents only 35.1% of the catalog by title but accounts for 51.9% of all hours viewed, and protect the momentum of its biggest hits while maintaining stable, long running shows that keeping subscribers/viewers engaged between major show releases. Also, expanding live events selectively and focusing on few high profile events rather than many smaller ones would be beneficial for the future.
+  
+  
+::: {.callout-note title="AI Usage Statement" collapse="true"}
+
+I used Claude to help write the R and Quarto code mostly for table questions but everythig else was written by me without any AI tool help.
+
+:::

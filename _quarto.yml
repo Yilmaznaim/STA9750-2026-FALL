@@ -9,6 +9,15 @@ website:
   site-url: "https://Yilmaznaim.github.io/STA9750-2026-FALL/"
   navbar:
     background: primary
+    left:
+      - text: "Mini-Project #01"
+        href: mp01.qmd
+      - text: "Mini-Project #02"
+        href: mp02.qmd
+      - text: "Mini-Project #03"
+        href: mp03.qmd
+      - text: "Mini-Project #04"
+        href: mp04.qmd
     search: false
     
 format:
