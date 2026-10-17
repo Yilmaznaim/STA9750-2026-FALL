@@ -2,8 +2,7 @@
 title: "Mini-Project #01"
 format:
   html:
-    code-fold: true
-    code-summary: "Show code"
+    code-fold: false
 ---
 # Part 1:*DATA*
 ```{r}
@@ -371,9 +370,9 @@ live_compare |>
 
   Globally available titles are only 35.1% however they account for 51.9% of all hours viewed. Netflix should create more shows that they take the control over and attract viewers to subscribe for the shows that are only on Netflix. This way dependency on other productions would be reduced. Therefore, investing on global titles will benefit future attractions and bring in more subscriber loyalty.
 
-  Moreover, maintaining the momentum of its most watched title and funding stable, long running shows are also benefiting Netflix strategy. For instance, Wednesday Season 2 reached 964.1 million hours in 2025H2. The highest number recorded for any title in the data shows that the top 10 titles of 2026H1 accounted for 6.70% of total viewing. Consistent shows maintain viewer interest between major releases. For instance, Breaking Bad Season 2 consistently had at least 78.5 million hours viewed across the seven periods. So, it would be wise to suggest that Netflix continue to invest in new seasons of established franchises and monitor each title's minimum viewership across different periods, rather than focusing solely on its peak viewership at launch, when making renewal decisions.
+  Moreover, maintaining the momentum of its most watched title and funding stable, long running shows are also benefiting Netflix strategy. For instance, Wednesday Season 2 reached 964.1 million hours in 2025H2. The highest number recorded for any title in the data shows that the top 10 titles of 2026H1 accounted for 6.70% of total viewing. Consistent shows maintain viewer interest between major releases. For instance, Breaking Bad Season 2 consistently had at least 78.5 million hours viewed across the seven periods. So, it would be wise to suggest that Netflix continue to invest in new seasons of established franchises and monitor each title's minimum viewership across different periods, rather than focusing on its peak viewership at launch, when making renewal decisions.
 
-  Netflix also organizes live events only rarely, yet the median live event still drew 1.7 million hours, close to the 1.8 million for pre-taped titles. This could be a valuable asset for Netflix if managed well. However, live events have a lower ceiling: the biggest live event reached 235.7 million hours, compared with 964.1 million for the biggest pre-taped title. For that reason, Netflix should be selective and focus on high profile, unique events. With live entertainment, viewers want to share in the hype and popularity within the community.
+  Netflix also organizes live events only rarely, yet the median live event still drew 1.7 million hours, close to the 1.8 million for pretaped titles. This could be a valuable asset for Netflix if managed well. However, live events have a lower ceiling: the biggest live event reached 235.7 million hours, compared with 964.1 million for the biggest pre-taped title. For that reason, Netflix should be selective and focus on high profile, unique events. With live entertainment, viewers want to share in the hype and popularity within the community.
 
   In conclusion, Netflix's future strategy should rest on prioritizing globally available series, which represents only 35.1% of the catalog by title but accounts for 51.9% of all hours viewed, and protect the momentum of its biggest hits while maintaining stable, long running shows that keeping subscribers/viewers engaged between major show releases. Also, expanding live events selectively and focusing on few high profile events rather than many smaller ones would be beneficial for the future.
   
