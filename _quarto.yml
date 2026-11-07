@@ -22,10 +22,18 @@ website:
 
 format:
   html:
-    theme: flatly
-    toc: false
-    code-fold: false
-    
+    theme: zephyr
+    css: custom.css
+    toc: true
+    toc-location: left
+    toc-depth: 3
+    smooth-scroll: true
+    code-fold: true
+    code-summary: "Show the code"
+    code-copy: hover
+execute:
+  message: false
+  warning: false
 
 editor:
   mode: source
